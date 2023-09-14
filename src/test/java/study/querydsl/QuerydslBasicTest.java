@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static study.querydsl.entity.QMember.member;
 
 @SpringBootTest
 @Transactional
@@ -22,8 +23,12 @@ public class QuerydslBasicTest {
     @PersistenceContext
     EntityManager em;
 
+    JPAQueryFactory queryFactory;
+
     @BeforeEach
     public void before() {
+
+        queryFactory = new JPAQueryFactory(em);
 
         Team teamA = new Team("teamA");
         Team teamB = new Team("teamB");
@@ -59,7 +64,7 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void startQuerydsl() throws Exception {
+    public void startQuerydslV1() throws Exception {
 
         //member1 찾기
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
@@ -69,6 +74,34 @@ public class QuerydslBasicTest {
                 .select(m)
                 .from(m)
                 .where(m.username.eq("member1")) //파라미터 바인딩 처리
+                .fetchOne();
+
+        assertThat(findMember.getUsername()).isEqualTo("member1");
+    }
+
+    @Test
+    public void startQuerydslV2() throws Exception {
+
+        //member1 찾기
+        QMember m = new QMember("m");
+
+        Member findMember = queryFactory
+                .select(m)
+                .from(m)
+                .where(m.username.eq("member1")) //파라미터 바인딩 처리
+                .fetchOne();
+
+        assertThat(findMember.getUsername()).isEqualTo("member1");
+    }
+
+    @Test
+    public void startQuerydslV3() throws Exception {
+
+        //member1 찾기
+        Member findMember = queryFactory
+                .select(member)
+                .from(member)
+                .where(member.username.eq("member1")) //파라미터 바인딩 처리
                 .fetchOne();
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
