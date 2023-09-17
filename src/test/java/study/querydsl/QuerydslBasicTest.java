@@ -2,6 +2,9 @@ package study.querydsl;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.assertj.core.api.Assertions;
@@ -494,5 +497,83 @@ public class QuerydslBasicTest {
         }
     }
 
+    /**
+     * 단순한 조건
+     */
+    @Test
+    public void case1() throws Exception {
+        List<String> result = queryFactory
+                .select(member.age
+                        .when(10).then("열살")
+                        .when(20).then("스무살")
+                        .otherwise("기타"))
+                .from(member)
+                .fetch();
+    }
+
+    /**
+     * 복잡한 조건
+     */
+     @Test
+     public void case2() throws Exception {
+         List<String> result = queryFactory
+                 .select(new CaseBuilder()
+                         .when(member.age.between(0, 20)).then("0~20살")
+                         .when(member.age.between(21, 30)).then("21~30살")
+                         .otherwise("기타"))
+                 .from(member)
+                 .fetch();
+     }
+
+    /**
+     * orderBy 에서 Case 믄 함꼐 사용하기
+     */
+
+    @Test
+    public void case3_orderBy() throws Exception {
+
+        NumberExpression<Integer> rankPath = new CaseBuilder()
+                .when(member.age.between(0, 20)).then(2)
+                .when(member.age.between(21, 30)).then(1)
+                .otherwise(3);
+
+        List<Tuple> result = queryFactory
+                .select(member.username, member.age, rankPath)
+                .from(member)
+                .orderBy(rankPath.desc())
+                .fetch();
+
+        for (Tuple tuple : result) {
+            String username = tuple.get(member.username);
+            Integer age = tuple.get(member.age);
+            Integer rank = tuple.get(rankPath);
+            System.out.println("username = " + username + " age = " + age + " rank = " + rank);
+        }
+
+    }
+
+    /**
+     * 상수
+     */
+    @Test
+    public void constant() throws Exception {
+        Tuple result = queryFactory
+                .select(member.username, Expressions.constant("A"))
+                .from(member)
+                .fetchFirst();
+
+        System.out.println("result = " + result.get(member.username) + " constant = " + result.get(Expressions.constant("A")));
+    }
+
+
+    @Test
+    public void concat() throws Exception {
+
+        String result = queryFactory
+                .select(member.username.concat("_").concat(member.age.stringValue()))
+                .from(member)
+                .where(member.username.eq("member1"))
+                .fetchOne();
+    }
 }
 
