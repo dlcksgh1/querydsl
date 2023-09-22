@@ -17,7 +17,7 @@ Querydsl 공부
 5. Querydsl - 중급문법(2)
    
    정리 블로그 링크 : https://velog.io/@cse05091/Querydsl-%EC%A4%91%EA%B8%89%EB%AC%B8%EB%B2%952
-6. https://velog.io/@cse05091/Querydsl-%EC%A4%91%EA%B8%89%EB%AC%B8%EB%B2%953
+6. Querydsl - 중급문법(3)
    
    정리 블로그 링크 : https://velog.io/@cse05091/Querydsl-%EC%A4%91%EA%B8%89%EB%AC%B8%EB%B2%953
 
